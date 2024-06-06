@@ -1,0 +1,18 @@
+{
+    "id": "fb1ac1a1-68ec-4703-af41-c7ac05fa06e8",
+    "version": "0.0.1",
+    "requiredApiVersion": "^1.19.0",
+    "iconFile": "icon.png",
+    "author": {
+        "name": "Guilherme Gazzo",
+        "homepage": "github.com/ggazzo",
+        "support": "github.com/ggazzo"
+    },
+    "name": "App.Rocket.Chat.AutoJoin.Discussions",
+    "nameSlug": "approcketchatautojoindiscussions",
+    "classFile": "AppRocketChatAutoJoinDiscussionsApp.ts",
+    "description": "Enable autojoin feature for discussions",
+    "implements": [
+        "IPostRoomUserJoined"
+    ]
+}
