@@ -2,13 +2,16 @@
 import { HttpStatusCode, IHttp, IModify, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { ApiEndpoint, IApiEndpointInfo, IApiRequest, IApiResponse } from '@rocket.chat/apps-engine/definition/api';
 
-export class Endpoint extends ApiEndpoint {
+export class ForceJoinEndpoint extends ApiEndpoint {
     public path = 'forceAddUsers';
 
     public async post(
         request: IApiRequest,
+        endpoint: IApiEndpointInfo,
         read: IRead,
         modify: IModify,
+        http: IHttp,
+        persis: IPersistence,
     ): Promise<IApiResponse> {
         const { content } = request;
         const { discussionId } = content;

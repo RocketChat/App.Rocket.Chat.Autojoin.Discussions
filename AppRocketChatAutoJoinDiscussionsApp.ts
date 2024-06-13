@@ -14,6 +14,8 @@ import {
     IRoomUserJoinedContext,
 } from "@rocket.chat/apps-engine/definition/rooms";
 import { AutoJoinCmd } from "./src/command";
+import { ApiSecurity, ApiVisibility } from "@rocket.chat/apps-engine/definition/api";
+import { ForceJoinEndpoint } from './src/endpoint';
 
 export class AppRocketChatAutoJoinDiscussionsApp
     extends App
@@ -74,5 +76,12 @@ export class AppRocketChatAutoJoinDiscussionsApp
 
     public async extendConfiguration(configuration: IConfigurationExtend) {
         configuration.slashCommands.provideSlashCommand(new AutoJoinCmd());
+
+        // Register API endpoints
+        await configuration.api.provideApi({
+            visibility: ApiVisibility.PUBLIC,
+            security: ApiSecurity.UNSECURE,
+            endpoints: [new ForceJoinEndpoint(this)],
+        });
     }
 }
