@@ -13,6 +13,7 @@
     "classFile": "AppRocketChatAutoJoinDiscussionsApp.ts",
     "description": "Enable autojoin feature for discussions",
     "implements": [
-        "IPostRoomUserJoined"
+        "IPostRoomUserJoined",
+        "IPostRoomUserLeave"
     ]
 }
