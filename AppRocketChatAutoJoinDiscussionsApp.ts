@@ -29,7 +29,7 @@ export class AppRocketChatAutoJoinDiscussionsApp
 
     async executePostRoomUserLeave(context: IRoomUserLeaveContext, read: IRead, http: IHttp, persistence: IPersistence, modify?: IModify | undefined): Promise<void> {
         const { room, leavingUser } = context;
-        console.log(room, leavingUser);
+
         if (room.parentRoom) {
             return;
         }
