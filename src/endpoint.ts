@@ -58,6 +58,8 @@ export class ForceJoinEndpoint extends ApiEndpoint {
             roomBuilder.setMembersToBeAddedByUsernames(userDif.map((u) => u.username));
         }
 
+        const updater = await modify.getUpdater();
+        updater?.finish(roomBuilder);
 
         return this.success();
     }
