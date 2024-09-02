@@ -41,9 +41,19 @@ export class AutoJoinCmd implements ISlashCommand {
         }
 
         const roomBuilder = await updater?.room(room.parentRoom.id, appUser);
+        const discussionRoomBuilder = await updater?.room(room.id, appUser);
 
         if (!roomBuilder) {
             return;
+        }
+
+        const parentRoomUsers = await read.getRoomReader().getMembers(room.parentRoom.id);
+        const discussionUsers = await read.getRoomReader().getMembers(room.id);
+
+        const userDif = parentRoomUsers.filter((user) => discussionUsers.findIndex((dUser) => dUser.id === user.id) < 0);
+
+        if (userDif.length > 0) {
+            discussionRoomBuilder.setMembersToBeAddedByUsernames(userDif.map((u) => u.username));
         }
 
         const autojoin = new Set(room.parentRoom.customFields?.autojoin ?? []);
@@ -55,6 +65,7 @@ export class AutoJoinCmd implements ISlashCommand {
         });
 
         await updater?.finish(roomBuilder);
+        await updater?.finish(discussionRoomBuilder);
 
         return this.notifyMessage(
             room,

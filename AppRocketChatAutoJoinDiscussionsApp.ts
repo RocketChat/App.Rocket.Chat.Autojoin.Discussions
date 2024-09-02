@@ -11,16 +11,42 @@ import { App } from "@rocket.chat/apps-engine/definition/App";
 import { IAppInfo } from "@rocket.chat/apps-engine/definition/metadata";
 import {
     IPostRoomUserJoined,
+    IPostRoomUserLeave,
     IRoomUserJoinedContext,
+    IRoomUserLeaveContext,
 } from "@rocket.chat/apps-engine/definition/rooms";
 import { AutoJoinCmd } from "./src/command";
+import { ApiSecurity, ApiVisibility } from "@rocket.chat/apps-engine/definition/api";
+import { ForceJoinEndpoint } from './src/endpoint';
 
 export class AppRocketChatAutoJoinDiscussionsApp
     extends App
-    implements IPostRoomUserJoined
+    implements IPostRoomUserJoined, IPostRoomUserLeave
 {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
+    }
+
+    async executePostRoomUserLeave(context: IRoomUserLeaveContext, read: IRead, http: IHttp, persistence: IPersistence, modify?: IModify | undefined): Promise<void> {
+        const { room, leavingUser } = context;
+
+        if (room.parentRoom) {
+            return;
+        }
+
+        const discussions = room.customFields?.autojoin;
+        if (!discussions || !Array.isArray(discussions)) {
+            return;
+        }
+
+        const deleter = modify?.getDeleter();
+        if (!deleter) {
+            return;
+        }
+
+        for await (const discussionId of discussions) {
+            deleter.removeUsersFromRoom(discussionId, [leavingUser.username]);
+        }
     }
 
     async executePostRoomUserJoined(
@@ -74,5 +100,12 @@ export class AppRocketChatAutoJoinDiscussionsApp
 
     public async extendConfiguration(configuration: IConfigurationExtend) {
         configuration.slashCommands.provideSlashCommand(new AutoJoinCmd());
+
+        // Register API endpoints
+        await configuration.api.provideApi({
+            visibility: ApiVisibility.PUBLIC,
+            security: ApiSecurity.UNSECURE,
+            endpoints: [new ForceJoinEndpoint(this)],
+        });
     }
 }
